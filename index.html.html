@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>فرز تطبيقات الإنترنت — جولة سريعة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1128; --panel:#191f47; --gold:#f2a93b; --teal:#5fd8cf; --text:#eef0fb; --muted:#9aa2cf;
+  --line:rgba(242,169,59,.25); --good:#5fd8a0; --bad:#e2586b;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{background:radial-gradient(circle at 50% -10%, #1b234f, var(--bg) 60%); color:var(--text); font-family:'Tajawal',sans-serif; min-height:100svh; display:flex; flex-direction:column; align-items:center;}
+.mono{font-family:'JetBrains Mono',monospace; direction:ltr;}
+.screen{width:100%; max-width:820px; padding:30px 5vw; text-align:center; flex:1; display:flex; flex-direction:column; justify-content:center;}
+h1{font-size:clamp(24px,4vw,34px); font-weight:900;}
+h1 span{color:var(--gold);}
+.sub{color:var(--muted); font-size:15px; margin:12px auto 0; max-width:55ch; line-height:1.8;}
+.hidden{display:none !important;}
+
+/* start */
+#nameRow{margin:26px auto 6px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;}
+#teamName{background:var(--panel); border:1px solid var(--line); color:var(--text); padding:12px 16px; border-radius:8px; font-family:'Tajawal',sans-serif; font-size:15px; width:220px; text-align:center;}
+.bigbtn{background:var(--gold); color:#191026; border:none; padding:15px 34px; border-radius:9px; font-weight:900; font-size:17px; cursor:pointer; margin-top:18px;}
+.bigbtn:hover{background:var(--teal);}
+#history{margin-top:34px; text-align:right;}
+#history h3{font-size:14px; color:var(--muted); margin-bottom:10px; text-align:center;}
+.hrow{display:flex; justify-content:space-between; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:8px 14px; margin-bottom:6px; font-size:14px;}
+.hrow b{color:var(--gold);}
+
+/* game */
+#game{max-width:900px;}
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; font-family:'JetBrains Mono',monospace; direction:ltr;}
+#timeLeft{color:var(--gold); font-size:22px;}
+#scoreLive{color:var(--teal); font-size:22px;}
+.barwrap{height:6px; background:var(--panel); border-radius:4px; overflow:hidden; margin-bottom:26px;}
+#barfill{height:100%; background:var(--gold); width:100%; transition:width 1s linear;}
+.itemcard{background:var(--panel); border:2px solid var(--line); border-radius:16px; padding:40px 20px; margin-bottom:26px; transition:.15s;}
+.itemcard .emoji{font-size:64px;}
+.itemcard .name{font-size:26px; font-weight:900; margin-top:12px;}
+.itemcard.good{border-color:var(--good); background:rgba(95,216,160,.08);}
+.itemcard.bad{border-color:var(--bad); background:rgba(226,88,107,.08);}
+#feedback{height:20px; font-size:14px; color:var(--muted); margin-bottom:16px;}
+#feedback.good{color:var(--good);}
+#feedback.bad{color:var(--bad);}
+.catgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+@media(max-width:640px){.catgrid{grid-template-columns:repeat(2,1fr);}}
+.catbtn{background:var(--panel); border:1px solid var(--line); color:var(--text); padding:16px 8px; border-radius:10px; font-family:'Tajawal',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:.15s;}
+.catbtn:hover{border-color:var(--teal); transform:translateY(-2px);}
+.catbtn:disabled{opacity:.4; cursor:default; transform:none;}
+
+/* end */
+#end .score{font-family:'JetBrains Mono',monospace; direction:ltr; font-size:56px; color:var(--gold); margin:14px 0;}
+#end .stat{color:var(--muted); font-size:15px;}
+</style>
+</head>
+<body>
+
+<div class="screen" id="start">
+  <h1>فرز <span>تطبيقات الإنترنت</span></h1>
+  <p class="sub">جولة سريعة 60 ثانية: كل بطاقة تُظهر تطبيقًا حقيقيًا — اضغط الفئة الصحيحة بأسرع ما يمكن. مناسبة لأول محاضرة كتحدٍ جماعي بين الفرق.</p>
+  <div id="nameRow">
+    <input id="teamName" placeholder="اسم الفريق أو الطالب" maxlength="20">
+  </div>
+  <button class="bigbtn" onclick="startGame()">ابدأ الجولة (60 ثانية)</button>
+  <div id="history"></div>
+</div>
+
+<div class="screen hidden" id="game">
+  <div class="topbar">
+    <div id="scoreLive">النقاط: 0</div>
+    <div id="timeLeft">⏱ 60</div>
+  </div>
+  <div class="barwrap"><div id="barfill"></div></div>
+  <div class="itemcard" id="itemCard">
+    <div class="emoji" id="itemEmoji">🌐</div>
+    <div class="name" id="itemName">...</div>
+  </div>
+  <div id="feedback"></div>
+  <div class="catgrid" id="catgrid"></div>
+</div>
+
+<div class="screen hidden" id="end">
+  <h1>انتهت <span>الجولة!</span></h1>
+  <div class="score" id="finalScore">0</div>
+  <div class="stat" id="finalStat"></div>
+  <button class="bigbtn" onclick="backToStart()">جولة فريق آخر</button>
+</div>
+
+<script>
+const CATS = [
+  {id:"social", label:"تواصل اجتماعي"},
+  {id:"ecom", label:"تجارة إلكترونية"},
+  {id:"learn", label:"تعليم إلكتروني"},
+  {id:"stream", label:"بث وترفيه"},
+  {id:"comm", label:"اتصالات ومراسلة"},
+  {id:"cloud", label:"تخزين سحابي"},
+  {id:"search", label:"محركات بحث"},
+  {id:"gaming", label:"ألعاب أونلاين"},
+];
+const ITEMS = [
+  {n:"Instagram", e:"📸", c:"social"},
+  {n:"X (Twitter)", e:"🐦", c:"social"},
+  {n:"TikTok", e:"🎵", c:"social"},
+  {n:"Facebook", e:"👍", c:"social"},
+  {n:"Amazon", e:"📦", c:"ecom"},
+  {n:"نون (noon)", e:"🛒", c:"ecom"},
+  {n:"eBay", e:"🏷️", c:"ecom"},
+  {n:"Coursera", e:"🎓", c:"learn"},
+  {n:"Google Classroom", e:"🏫", c:"learn"},
+  {n:"Khan Academy", e:"📘", c:"learn"},
+  {n:"Netflix", e:"🎬", c:"stream"},
+  {n:"YouTube", e:"▶️", c:"stream"},
+  {n:"Spotify", e:"🎧", c:"stream"},
+  {n:"WhatsApp", e:"💬", c:"comm"},
+  {n:"Zoom", e:"📹", c:"comm"},
+  {n:"Gmail", e:"✉️", c:"comm"},
+  {n:"Google Drive", e:"☁️", c:"cloud"},
+  {n:"Dropbox", e:"🗂️", c:"cloud"},
+  {n:"iCloud", e:"🍎", c:"cloud"},
+  {n:"Google Search", e:"🔍", c:"search"},
+  {n:"Bing", e:"🔎", c:"search"},
+  {n:"Fortnite", e:"🎮", c:"gaming"},
+  {n:"PUBG Mobile", e:"🕹️", c:"gaming"},
+];
+
+let pool=[], current=null, score=0, correctCount=0, totalCount=0, timeLeft=60, timerInt=null;
+
+function shuffledPool(){ return [...ITEMS].sort(()=>Math.random()-.5); }
+
+function renderCats(){
+  document.getElementById('catgrid').innerHTML = CATS.map(c=>
+    `<button class="catbtn" onclick="answer('${c.id}')">${c.label}</button>`).join('');
+}
+
+function startGame(){
+  document.getElementById('start').classList.add('hidden');
+  document.getElementById('end').classList.add('hidden');
+  document.getElementById('game').classList.remove('hidden');
+  pool = shuffledPool(); score=0; correctCount=0; totalCount=0; timeLeft=60;
+  document.getElementById('scoreLive').textContent = 'النقاط: 0';
+  document.getElementById('barfill').style.width='100%';
+  renderCats();
+  nextItem();
+  clearInterval(timerInt);
+  timerInt = setInterval(()=>{
+    timeLeft--;
+    document.getElementById('timeLeft').textContent = '⏱ '+timeLeft;
+    document.getElementById('barfill').style.width = (timeLeft/60*100)+'%';
+    if(timeLeft<=0) endGame();
+  },1000);
+}
+
+function nextItem(){
+  if(pool.length===0) pool = shuffledPool();
+  current = pool.pop();
+  document.getElementById('itemEmoji').textContent = current.e;
+  document.getElementById('itemName').textContent = current.n;
+  document.getElementById('itemCard').className='itemcard';
+  document.getElementById('feedback').textContent='';
+  document.getElementById('feedback').className='';
+}
+
+function answer(catId){
+  if(timeLeft<=0) return;
+  totalCount++;
+  const card = document.getElementById('itemCard');
+  const fb = document.getElementById('feedback');
+  const catLabel = CATS.find(c=>c.id===current.c).label;
+  if(catId===current.c){
+    score++; correctCount++;
+    card.className='itemcard good';
+    fb.textContent='✔ صحيح!'; fb.className='good';
+    document.getElementById('scoreLive').textContent='النقاط: '+score;
+  } else {
+    card.className='itemcard bad';
+    fb.textContent='✘ الصحيح: '+catLabel; fb.className='bad';
+  }
+  setTimeout(nextItem, 550);
+}
+
+function endGame(){
+  clearInterval(timerInt);
+  document.getElementById('game').classList.add('hidden');
+  document.getElementById('end').classList.remove('hidden');
+  document.getElementById('finalScore').textContent = score;
+  const acc = totalCount ? Math.round(correctCount/totalCount*100) : 0;
+  document.getElementById('finalStat').textContent = `${totalCount} محاولة — دقة ${acc}%`;
+  const name = document.getElementById('teamName').value.trim() || 'فريق بدون اسم';
+  history.push({name, score});
+  renderHistory();
+}
+
+let history = [];
+function renderHistory(){
+  const box = document.getElementById('history');
+  if(history.length===0){ box.innerHTML=''; return; }
+  const sorted = [...history].sort((a,b)=>b.score-a.score);
+  box.innerHTML = '<h3>نتائج الجولات السابقة</h3>' +
+    sorted.map(h=>`<div class="hrow"><span>${h.name}</span><b>${h.score}</b></div>`).join('');
+}
+
+function backToStart(){
+  document.getElementById('end').classList.add('hidden');
+  document.getElementById('start').classList.remove('hidden');
+  document.getElementById('teamName').value='';
+}
+</script>
+</body>
+</html>
